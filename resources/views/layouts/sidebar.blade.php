@@ -47,8 +47,8 @@
                         </p>
                     </a>
                 </li>
-                <li class="nav-item {{ Request::is('users*') || Request::is('departments*') || Request::is('budget-departments*') || Request::is('units*') || Request::is('suppliers*') ? 'menu-open' : '' }}">
-                    <a href="#" class="nav-link {{ Request::is('users*') || Request::is('departments*') || Request::is('budget-departments*') || Request::is('suppliers*') ? 'active' : '' }}">
+                <li class="nav-item {{ Request::is('users*') || Request::is('departments*') || Request::is('budget-departments*') || Request::is('units*') || Request::is('suppliers*') || Request::is('po-approvals*') ? 'menu-open' : '' }}">
+                    <a href="#" class="nav-link {{ Request::is('users*') || Request::is('departments*') || Request::is('budget-departments*') || Request::is('suppliers*') || Request::is('po-approvals*') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-th"></i>
                         <p>
                             MASTER
@@ -57,7 +57,7 @@
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="#" class="nav-link {{ Request::is('users*') ? 'active' : '' }}">
+                            <a href="{{ route('users.index') }}" class="nav-link {{ Request::is('users*') ? 'active' : '' }}">
                                 <i class="fas fa-users nav-icon"></i>
                                 <p>Users</p>
                             </a>
@@ -86,18 +86,24 @@
                                 <p>Supplier</p>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link {{ Request::is('po-approvals*') ? 'active' : '' }}">
+                                <i class="fas fa-circle nav-icon"></i>
+                                <p>PO Approval</p>
+                            </a>
+                        </li>
                     </ul>
                 </li>
-                <li class="nav-item">
+                {{-- <li class="nav-item">
                     <a href="{{ route('purchase-requisitions.index') }}" class="nav-link {{ Request::is('purchase-requisitions*') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-file-alt"></i>
                         <p>
                             Purchase Requisition
                         </p>
                     </a>
-                </li>
+                </li> --}}
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="{{ route('purchase-orders.index') }}" class="nav-link {{ Request::is('purchase-orders*') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-shopping-cart"></i>
                         <p>
                             Purchase Order

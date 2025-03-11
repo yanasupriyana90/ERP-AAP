@@ -21,20 +21,26 @@ class DepartmentSeeder extends Seeder
                 'updated_at' => now()
             ],
             [
+                'name' => 'Direktur',
+                'code' => 'CEO',
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
                 'name' => 'Finance',
                 'code' => 'FNC',
                 'created_at' => now(),
                 'updated_at' => now()
             ],
             [
-                'name' => 'IT',
+                'name' => 'Information Technology',
                 'code' => 'MIS',
                 'created_at' => now(),
                 'updated_at' => now()
             ],
             [
-                'name' => 'Human Resource',
-                'code' => 'HRD',
+                'name' => 'Operational',
+                'code' => 'OPR',
                 'created_at' => now(),
                 'updated_at' => now()
             ],

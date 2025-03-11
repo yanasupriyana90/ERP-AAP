@@ -21,7 +21,7 @@ return new class extends Migration
         // Tambahkan kolom department_id di tabel users
         Schema::table('users', function (Blueprint $table) {
             $table->foreignId('department_id')->nullable()->constrained('departments')->onDelete('set null');
-            $table->enum('role', ['Superuser', 'Manager', 'Supervisor', 'Staff', 'Admin'])->default('Staff');
+            $table->enum('role', ['Superuser', 'Direksi', 'Direktur', 'Manager', 'Supervisor', 'Staff'])->default('Staff');
         });
     }
 
