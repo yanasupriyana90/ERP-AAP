@@ -86,12 +86,6 @@
                                 <p>Supplier</p>
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a href="#" class="nav-link {{ Request::is('po-approvals*') ? 'active' : '' }}">
-                                <i class="fas fa-circle nav-icon"></i>
-                                <p>PO Approval</p>
-                            </a>
-                        </li>
                     </ul>
                 </li>
                 {{-- <li class="nav-item">

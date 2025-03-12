@@ -28,11 +28,17 @@ class PurchaseOrderController extends Controller
         // Ambil semua Purchase Order beserta relasi
         $query = PurchaseOrder::with('department', 'budgetDepartment', 'supplier', 'items');
 
+        // Jika bukan Superuser atau Direktur, filter berdasarkan department_id
+        if (!in_array($user->role, ['Superuser', 'Direktur'])) {
+            $query->where('department_id', $user->department_id);
+        }
+
         // Ambil data secara descending berdasarkan ID
         $purchaseOrders = $query->orderBy('id', 'desc')->get();
 
         return view('purchase-orders.index', compact('purchaseOrders'));
     }
+
 
 
 
@@ -73,15 +79,21 @@ class PurchaseOrderController extends Controller
 
         DB::beginTransaction();
         try {
-            // Generate nomor PO otomatis
-            $poNumber = 'PO-' . strtoupper(Str::random(6));
+
+            // 🔹 **Generate Unique PR Number**
+            $lastPR = PurchaseRequisition::whereDate('created_at', now()->toDateString())
+                ->latest('id')
+                ->first();
+
+            $nextNumber = $lastPR ? ((int) substr($lastPR->po_number, -5)) + 1 : 1;
+            $po_number = 'PO-' . now()->format('ymd') . str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
 
             $purchaseOrder = PurchaseOrder::create([
                 'user_id' => Auth::id(),
                 'department_id' => $request->department_id,
                 'budget_department_id' => $request->budget_department_id,
                 'supplier_id' => $request->supplier_id,
-                'po_number' => $poNumber,
+                'po_number' => $po_number,
                 'po_date' => $request->po_date,
                 'total_amount' => 0, // Akan dihitung ulang
                 'status' => 0, // Default Pending

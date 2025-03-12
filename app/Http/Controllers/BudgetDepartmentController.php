@@ -7,6 +7,7 @@ use App\Models\Department;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class BudgetDepartmentController extends Controller
 {
@@ -15,9 +16,21 @@ class BudgetDepartmentController extends Controller
      */
     public function index()
     {
-        $budgetDepartments = BudgetDepartment::with('user', 'department')->get();
+        $today = Carbon::today(); // Ambil tanggal hari ini
+
+        // Update budget_departments yang sudah melewati valid_to
+        BudgetDepartment::where('valid_to', '<', $today)
+            ->orWhere('valid_from', '>', $today)
+            ->update(['status' => 1]); // 1 = Nonaktif
+
+        // Ambil hanya budget yang masih aktif beserta relasinya
+        $budgetDepartments = BudgetDepartment::with(['user', 'department'])
+            // ->where('status', 0)
+            ->get();
+
         return view('budget-departments.index', compact('budgetDepartments'));
     }
+
 
     /**
      * Show the form for creating a new resource.
@@ -43,29 +56,17 @@ class BudgetDepartmentController extends Controller
             'status' => 'required|numeric|in:0,1',
         ]);
 
-        // Ambil bulan dan tahun saat ini
-        $yearMonth = date('Ym');
-
-        // Cari kode terakhir dengan format BD-YYYYMM-XXXXX
-        $latestBudget = BudgetDepartment::where('code', 'like', "BD-{$yearMonth}-%")
-            ->orderBy('code', 'desc')
+        $lastBudget = BudgetDepartment::whereDate('created_at', now()->toDateString())
+            ->latest('id')
             ->first();
 
-        // Ambil nomor urut terakhir, jika ada +1, jika tidak mulai dari 00001
-        if ($latestBudget) {
-            $lastNumber = (int) substr($latestBudget->code, -5);
-            $newNumber = str_pad($lastNumber + 1, 5, '0', STR_PAD_LEFT);
-        } else {
-            $newNumber = '00001';
-        }
-
-        // Generate kode baru
-        $newCode = "BD-{$yearMonth}-{$newNumber}";
+        $nextNumber = $lastBudget ? ((int) substr($lastBudget->code, -5)) + 1 : 1;
+        $newCode = 'BGT-' . now()->format('ymd') . str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
 
         $remainingAmount = $request->amount; // Sisa dana awal = jumlah dana
 
         BudgetDepartment::create([
-            'user_id' =>Auth::id(),
+            'user_id' => Auth::id(),
             'department_id' => $request->department_id,
             'code' => $newCode,
             'name' => $request->name,

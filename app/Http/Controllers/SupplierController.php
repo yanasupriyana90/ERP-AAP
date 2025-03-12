@@ -38,9 +38,12 @@ class SupplierController extends Controller
             'contact_person' => 'nullable|string|max:255',
         ]);
 
-        // Generate kode supplier otomatis (format: SUP-0001, SUP-0002, dst.)
-        $latestSupplier = Supplier::latest()->first();
-        $newCode = 'SUP-' . str_pad($latestSupplier ? ($latestSupplier->id + 1) : 1, 4, '0', STR_PAD_LEFT);
+        $lastSupplier = Supplier::whereDate('created_at', now()->toDateString())
+            ->latest('id')
+            ->first();
+
+        $nextNumber = $lastSupplier ? ((int) substr($lastSupplier->code, -5)) + 1 : 1;
+        $newCode = 'SUP-' . now()->format('ymd') . str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
 
         Supplier::create([
             'code' => $newCode,
