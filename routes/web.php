@@ -32,7 +32,8 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
+    // Route::get('/dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::resource('departments', DepartmentController::class);
     Route::resource('users', UserController::class);
     Route::resource('budget-departments', BudgetDepartmentController::class);
@@ -43,7 +44,11 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/purchase-orders/{id}/approve', [PoApprovalController::class, 'approve'])->name('purchase-orders.approve');
     Route::post('/purchase-orders/{id}/reject', [PoApprovalController::class, 'reject'])->name('purchase-orders.reject');
     Route::get('/purchase-orders/{id}/print', [PurchaseOrderController::class, 'print'])->name('purchase-orders.print');
+
 });
+
+// Route::get('/dashboard-staff', [DashboardController::class, 'staffDashboard'])->name('dashboard.staff')
+// ->middleware('auth', 'role:Staff');
 
 
 
