@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BudgetDepartment;
 use App\Models\PoApproval;
 use App\Models\PurchaseOrder;
 use Illuminate\Http\Request;
@@ -48,11 +49,25 @@ class PoApprovalController extends Controller
         // Cek apakah semua approval sudah selesai
         $pendingApprovals = PoApproval::where('po_id', $id)->where('status', 0)->count();
         if ($pendingApprovals === 0) {
-            $po->update(['status' => 1]); // Approved
+            // Cek apakah budget mencukupi sebelum approve
+            $budget = BudgetDepartment::find($po->budget_department_id);
+            if ($budget->remaining_amount < $po->total_amount) {
+                return back()->with('error', 'Budget tidak mencukupi untuk Purchase Order ini.');
+            }
+
+            // Update status PO ke Approved
+            $po->update(['status' => 1]);
+
+            // Potong budget
+            $budget->update([
+                'used_amount' => $budget->used_amount + $po->total_amount,
+                'remaining_amount' => $budget->remaining_amount - $po->total_amount
+            ]);
         }
 
         return back()->with('success', 'Purchase Order berhasil diapprove.');
     }
+
 
     public function reject(Request $request, $id)
     {
@@ -74,7 +89,17 @@ class PoApprovalController extends Controller
             'notes' => $request->notes
         ]);
 
-        $po->update(['status' => 2]); // Set PO menjadi rejected
+        // Cek apakah PO sudah disetujui sebelumnya, jika iya, kembalikan budget
+        if ($po->status == 1) {
+            $budget = BudgetDepartment::find($po->budget_department_id);
+            $budget->update([
+                'used_amount' => $budget->used_amount - $po->total_amount,
+                'remaining_amount' => $budget->remaining_amount + $po->total_amount
+            ]);
+        }
+
+        // Set PO menjadi rejected
+        $po->update(['status' => 2]);
 
         return back()->with('error', 'Purchase Order ditolak.');
     }

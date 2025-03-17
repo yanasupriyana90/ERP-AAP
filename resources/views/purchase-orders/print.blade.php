@@ -41,7 +41,7 @@
             <div class="row">
                 <div class="col-12 text-center">
                     <h2 class="page-header">
-                        <img src="{{ asset('logo.png') }}" alt="Logo" style="height: 50px;">
+                        <img src="{{ asset('adminlte/dist/img/logo.png') }}" alt="Logo" style="height: 50px;">
                         <span class="ml-2">Purchase Order</span>
                         <small class="float-right">Tanggal: {{ \Carbon\Carbon::now()->format('d-m-Y H:i') }}</small>
                     </h2>

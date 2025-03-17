@@ -54,4 +54,14 @@ class PurchaseOrder extends Model
     {
         return $this->hasMany(PoApproval::class, 'po_id');
     }
+
+    public function getUnitPriceFormattedAttribute()
+    {
+        return number_format($this->unit_price, 0, ',', '.');
+    }
+
+    public function getTotalPriceFormattedAttribute()
+    {
+        return number_format($this->total_price, 0, ',', '.');
+    }
 }

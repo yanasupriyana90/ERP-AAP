@@ -26,6 +26,7 @@ class BudgetDepartmentController extends Controller
         // Ambil hanya budget yang masih aktif beserta relasinya
         $budgetDepartments = BudgetDepartment::with(['user', 'department'])
             // ->where('status', 0)
+            ->orderBy('id', 'desc')
             ->get();
 
         return view('budget-departments.index', compact('budgetDepartments'));
@@ -53,7 +54,7 @@ class BudgetDepartmentController extends Controller
             'amount' => 'required|numeric',
             'valid_from' => 'required|date',
             'valid_to' => 'required|date',
-            'status' => 'required|numeric|in:0,1',
+            // 'status' => 'required|numeric|in:0,1',
         ]);
 
         $lastBudget = BudgetDepartment::whereDate('created_at', now()->toDateString())
@@ -75,7 +76,7 @@ class BudgetDepartmentController extends Controller
             'remaining_amount' => $remainingAmount,
             'valid_from' => $request->valid_from,
             'valid_to' => $request->valid_to,
-            'status' => $request->status,
+            // 'status' => $request->status,
         ]);
 
         return redirect()->route('budget-departments.index')->with('success', 'Budget Department berhasil ditambahkan.');

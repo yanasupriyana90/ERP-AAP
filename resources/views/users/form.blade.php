@@ -34,7 +34,7 @@
 <div class="form-group">
     <label>Role</label>
     <select name="role" class="form-control">
-        @foreach(['Superuser', 'Manager', 'Supervisor', 'Staff', 'Admin'] as $role)
+        @foreach(['Superuser', 'Direktur', 'Manager', 'Supervisor', 'Staff'] as $role)
             <option value="{{ $role }}" {{ old('role', $user->role ?? '') == $role ? 'selected' : '' }}>
                 {{ $role }}
             </option>

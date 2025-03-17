@@ -74,20 +74,22 @@ class PurchaseOrderController extends Controller
             'items.*.item_name' => 'required|string',
             'items.*.quantity' => 'required|numeric|min:1',
             'items.*.unit_id' => 'required|exists:units,id',
-            'items.*.unit_price' => 'required|numeric|min:1',
+            'items.*.unit_price' => 'required|string', // Terima string karena input formatted Rupiah
         ]);
 
         DB::beginTransaction();
         try {
+            // 🔹 **Generate Unique PO Number**
+            do {
+                $lastPO = PurchaseOrder::whereDate('created_at', now()->toDateString())
+                    ->latest('id')
+                    ->first();
 
-            // 🔹 **Generate Unique PR Number**
-            $lastPR = PurchaseRequisition::whereDate('created_at', now()->toDateString())
-                ->latest('id')
-                ->first();
+                $nextNumber = $lastPO ? ((int) substr($lastPO->po_number, -5)) + 1 : 1;
+                $po_number = 'PO-' . now()->format('ymd') . str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
+            } while (PurchaseOrder::where('po_number', $po_number)->exists()); // Cek duplikasi
 
-            $nextNumber = $lastPR ? ((int) substr($lastPR->po_number, -5)) + 1 : 1;
-            $po_number = 'PO-' . now()->format('ymd') . str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
-
+            // 🔹 **Buat Purchase Order**
             $purchaseOrder = PurchaseOrder::create([
                 'user_id' => Auth::id(),
                 'department_id' => $request->department_id,
@@ -101,8 +103,10 @@ class PurchaseOrderController extends Controller
             ]);
 
             $totalAmount = 0;
-            foreach ($request->items as $item) {
-                $totalPrice = $item['quantity'] * $item['unit_price'];
+            foreach ($request->items as $index => $item) {
+                // 🔹 **Format unit_price ke angka (tanpa format Rupiah)**
+                $unitPrice = (int) str_replace(['Rp', '.', ','], '', $item['unit_price']);
+                $totalPrice = $item['quantity'] * $unitPrice;
                 $totalAmount += $totalPrice;
 
                 PurchaseOrderItem::create([
@@ -111,15 +115,16 @@ class PurchaseOrderController extends Controller
                     'description' => $item['description'] ?? null,
                     'quantity' => $item['quantity'],
                     'unit_id' => $item['unit_id'],
-                    'unit_price' => $item['unit_price'],
+                    'unit_price' => $unitPrice,
                     'total_price' => $totalPrice,
                 ]);
             }
 
-            // Update total amount di PO
+
+            // 🔹 **Update total amount di PO**
             $purchaseOrder->update(['total_amount' => $totalAmount]);
 
-            // Update Budget Department
+            // 🔹 **Cek apakah Budget Department memiliki cukup dana**
             $budgetDepartment = BudgetDepartment::findOrFail($request->budget_department_id);
 
             if ($budgetDepartment->remaining_amount < $totalAmount) {
@@ -127,12 +132,7 @@ class PurchaseOrderController extends Controller
                 return back()->with('error', 'Dana tidak mencukupi dalam Budget Department.');
             }
 
-            $budgetDepartment->update([
-                'used_amount' => $budgetDepartment->used_amount + $totalAmount,
-                'remaining_amount' => $budgetDepartment->remaining_amount - $totalAmount,
-            ]);
-
-            // Tambahkan Approval Manager
+            // 🔹 **Tambah Approval Manager**
             $manager = User::where('role', 'Manager')
                 ->where('department_id', $request->department_id)
                 ->first();
@@ -146,7 +146,7 @@ class PurchaseOrderController extends Controller
                 ]);
             }
 
-            // Tambahkan Approval Direktur
+            // 🔹 **Tambah Approval Direktur**
             $direktur = User::where('role', 'Direktur')->first();
             if ($direktur) {
                 PoApproval::create([
@@ -159,10 +159,9 @@ class PurchaseOrderController extends Controller
 
             DB::commit();
 
-            // Redirect ke halaman show dengan print otomatis
+            // Redirect ke halaman show
             return redirect()->route('purchase-orders.show', $purchaseOrder->id)
-                ->with('success', 'Purchase Order berhasil dibuat dan menunggu approval.')
-                ->with('print', true);
+                ->with('success', 'Purchase Order berhasil dibuat dan menunggu approval.');
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
@@ -208,6 +207,13 @@ class PurchaseOrderController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $request->merge([
+            'items' => array_map(function ($item) {
+                $item['unit_price'] = (float) str_replace(['Rp', '.', ','], '', $item['unit_price']);
+                return $item;
+            }, $request->items),
+        ]);
+
         $request->validate([
             'department_id' => 'required',
             'budget_department_id' => 'required',
@@ -223,20 +229,18 @@ class PurchaseOrderController extends Controller
         DB::beginTransaction();
         try {
             $purchaseOrder = PurchaseOrder::findOrFail($id);
-            $oldBudgetDepartment = BudgetDepartment::findOrFail($purchaseOrder->budget_department_id);
 
-            // Kembalikan anggaran sebelumnya
-            $oldBudgetDepartment->update([
-                'used_amount' => $oldBudgetDepartment->used_amount - $purchaseOrder->total_amount,
-                'remaining_amount' => $oldBudgetDepartment->remaining_amount + $purchaseOrder->total_amount,
-            ]);
+            // Ambil budget department saat ini
+            $budgetDepartment = BudgetDepartment::findOrFail($request->budget_department_id);
 
             // Hitung total amount baru
             $totalAmount = 0;
             $existingItems = PurchaseOrderItem::where('po_id', $id)->get()->keyBy('id');
 
             foreach ($request->items as $itemData) {
-                $totalPrice = $itemData['quantity'] * $itemData['unit_price'];
+                // Hapus format "Rp" & "." dari unit_price sebelum dihitung
+                $cleanUnitPrice = (int) str_replace(['Rp', '.', ','], '', $itemData['unit_price']);
+                $totalPrice = $itemData['quantity'] * $cleanUnitPrice;
                 $totalAmount += $totalPrice;
 
                 if (!empty($itemData['id']) && isset($existingItems[$itemData['id']])) {
@@ -267,9 +271,8 @@ class PurchaseOrderController extends Controller
                 PurchaseOrderItem::whereIn('id', $existingItems->keys())->delete();
             }
 
-            // Validasi dana cukup sebelum update budget
-            $newBudgetDepartment = BudgetDepartment::findOrFail($request->budget_department_id);
-            if ($newBudgetDepartment->remaining_amount < $totalAmount) {
+            // Validasi apakah dana cukup sebelum update budget department
+            if ($budgetDepartment->remaining_amount < $totalAmount) {
                 DB::rollBack();
                 return back()->with('error', 'Dana tidak mencukupi dalam Budget Department.');
             }
@@ -284,17 +287,10 @@ class PurchaseOrderController extends Controller
                 'total_amount' => $totalAmount,
             ]);
 
-            // Kurangi anggaran baru
-            $newBudgetDepartment->update([
-                'used_amount' => $newBudgetDepartment->used_amount + $totalAmount,
-                'remaining_amount' => $newBudgetDepartment->remaining_amount - $totalAmount,
-            ]);
-
             DB::commit();
 
             return redirect()->route('purchase-orders.show', $purchaseOrder->id)
-                ->with('success', 'Purchase Order berhasil diperbarui dan siap dicetak.')
-                ->with('print', true);
+                ->with('success', 'Purchase Order berhasil diperbarui.');
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());

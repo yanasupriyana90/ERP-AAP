@@ -4,7 +4,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('title', 'ERP AAP')</title>
+    <title>@yield('title', 'ERP-AAP')</title>
+    <link rel="icon" href="{{ asset('adminlte/dist/img/logo.ico') }}" type="image/x-icon">
 
     <!-- AdminLTE CSS -->
     <link rel="stylesheet" href="{{ asset('adminlte/dist/css/adminlte.min.css') }}">
@@ -54,6 +55,8 @@
             toastr.error("{{ session('error') }}");
         @endif
     </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.7-beta.19/jquery.inputmask.min.js"></script>
+    <script src="{{ asset('adminlte/plugins/inputmask/inputmask.min.js') }}"></script>
 </body>
 
 </html>

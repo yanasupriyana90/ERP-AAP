@@ -13,7 +13,7 @@ class UnitController extends Controller
      */
     public function index()
     {
-        $units = Unit::with('user')->get();
+        $units = Unit::with('user')->orderBy('id', 'desc')->get();
         return view('units.index', compact('units'));
     }
 
