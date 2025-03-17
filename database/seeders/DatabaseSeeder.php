@@ -30,7 +30,7 @@ class DatabaseSeeder extends Seeder
             UnitSeeder::class,
         ]);
 
-        BudgetDepartment::factory()->count(10)->create();
+        // BudgetDepartment::factory()->count(10)->create();
 
         // // Generate 10 Purchase Orders
         // PurchaseOrder::factory(10)->create()->each(function ($po) {

@@ -22,4 +22,8 @@ class PurchaseOrderItem extends Model
     {
         return $this->belongsTo(Unit::class, 'unit_id');
     }
+
+    protected $casts = [
+        'quantity' => 'float',
+    ];
 }

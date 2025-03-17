@@ -89,8 +89,8 @@
                         <tr>
                             <td><input type="text" name="items[0][item_name]" class="form-control"></td>
                             <td><input type="text" name="items[0][description]" class="form-control"></td>
-                            <td><input type="number" name="items[0][quantity]" class="form-control quantity" data-index="0"
-                                    oninput="calculateTotal(0)"></td>
+                            <td><input type="number" step="0.01" name="items[0][quantity]" class="form-control quantity"
+                                    data-index="0" oninput="calculateTotal(0)"></td>
                             <td>
                                 <select name="items[0][unit_id]" class="form-control">
                                     @foreach ($units as $unit)
@@ -111,7 +111,8 @@
                                     class="form-control total_price text-right" value="{{ old('items.0.total_price') }}"
                                     readonly>
                             </td>
-                            <td><button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)"><i class="fas fa-trash"></i></button>
+                            <td><button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)"><i
+                                        class="fas fa-trash"></i></button>
                             </td>
                         </tr>
                     </tbody>
@@ -158,7 +159,7 @@
         function calculateTotal(index) {
             let quantity = document.querySelector(`[name="items[${index}][quantity]"]`).value;
             let unitPrice = document.querySelector(`[name="items[${index}][unit_price]"]`).value.replace(/\D/g, "");
-            let totalPrice = (quantity * unitPrice) || 0;
+            let totalPrice = Math.round(quantity * unitPrice * 100) / 100; // Membulatkan ke 2 desimal
 
             document.querySelector(`[name="items[${index}][total_price]"]`).value = "Rp " + formatRupiah(totalPrice
                 .toString());
@@ -192,7 +193,8 @@
             newRow.innerHTML = `
                 <td><input type="text" name="items[${itemIndex}][item_name]" class="form-control"></td>
                 <td><input type="text" name="items[${itemIndex}][description]" class="form-control"></td>
-                <td><input type="number" name="items[${itemIndex}][quantity]" class="form-control quantity" data-index="${itemIndex}" oninput="calculateTotal(${itemIndex})"></td>
+                <td><input type="number" step="0.01" name="items[${itemIndex}][quantity]" class="form-control quantity"
+                    data-index="${itemIndex}" oninput="calculateTotal(${itemIndex})"></td>
                 <td>
                     <select name="items[${itemIndex}][unit_id]" class="form-control">
                         @foreach ($units as $unit)

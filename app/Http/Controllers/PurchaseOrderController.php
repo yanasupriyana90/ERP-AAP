@@ -72,7 +72,7 @@ class PurchaseOrderController extends Controller
             'po_date' => 'required|date',
             'notes' => 'nullable|string',
             'items.*.item_name' => 'required|string',
-            'items.*.quantity' => 'required|numeric|min:1',
+            'items.*.quantity' => 'required|numeric|min:0.01',
             'items.*.unit_id' => 'required|exists:units,id',
             'items.*.unit_price' => 'required|string', // Terima string karena input formatted Rupiah
         ]);
@@ -221,7 +221,7 @@ class PurchaseOrderController extends Controller
             'po_date' => 'required|date',
             'notes' => 'nullable|string',
             'items.*.item_name' => 'required|string',
-            'items.*.quantity' => 'required|numeric|min:1',
+            'items.*.quantity' => 'required|numeric|min:0.01',
             'items.*.unit_id' => 'required|exists:units,id',
             'items.*.unit_price' => 'required|numeric|min:1',
         ]);

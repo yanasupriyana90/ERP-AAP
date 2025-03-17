@@ -98,10 +98,16 @@
                                 <td><input type="text" name="items[{{ $index }}][description]"
                                         class="form-control"
                                         value="{{ old('items.' . $index . '.description', $item->description) }}"></td>
-                                <td><input type="number" name="items[{{ $index }}][quantity]"
+                                {{-- <td><input type="number" name="items[{{ $index }}][quantity]"
+                                        class="form-control quantity" data-index="{{ $index }}"
+                                        oninput="calculateTotal({{ $index }})"
+                                        value="{{ old('items.' . $index . '.quantity', $item->quantity) }}"></td> --}}
+
+                                <td><input type="number" step="0.01" name="items[{{ $index }}][quantity]"
                                         class="form-control quantity" data-index="{{ $index }}"
                                         oninput="calculateTotal({{ $index }})"
                                         value="{{ old('items.' . $index . '.quantity', $item->quantity) }}"></td>
+
                                 <td>
                                     <select name="items[{{ $index }}][unit_id]" class="form-control">
                                         @foreach ($units as $unit)
@@ -165,7 +171,7 @@
             newRow.innerHTML = `
                 <td><input type="text" name="items[${itemIndex}][item_name]" class="form-control"></td>
                 <td><input type="text" name="items[${itemIndex}][description]" class="form-control"></td>
-                <td><input type="number" name="items[${itemIndex}][quantity]" class="form-control quantity" data-index="${itemIndex}" oninput="calculateTotal(${itemIndex})"></td>
+                <td><input type="number" step="0.01" name="items[${itemIndex}][quantity]" class="form-control quantity" data-index="${itemIndex}" oninput="calculateTotal(${itemIndex})"></td>
                 <td>
                     <select name="items[${itemIndex}][unit_id]" class="form-control">
                         @foreach ($units as $unit)
@@ -195,20 +201,31 @@
             updateTotalAmount();
         }
 
+        // function calculateTotal(index) {
+        //     let quantity = document.querySelector(`[name="items[${index}][quantity]"]`).value;
+        //     let unitPriceInput = document.querySelector(`[name="items[${index}][unit_price]"]`);
+        //     let totalPriceInput = document.querySelector(`[name="items[${index}][total_price]"]`);
+
+
+        //     let unitPrice = unitPriceInput.value.replace(/\D/g, ""); // Hanya angka
+        //     let totalPrice = (quantity * unitPrice) || 0;
+
+        //     // Update Total Price dan pastikan tetap dalam format Rupiah
+        //     totalPriceInput.value = formatRupiah(totalPrice.toString());
+
+        //     // Format ulang Unit Price setiap kali ada perubahan
+        //     formatCurrency(unitPriceInput);
+
+        //     updateTotalAmount();
+        // }
+
         function calculateTotal(index) {
             let quantity = document.querySelector(`[name="items[${index}][quantity]"]`).value;
-            let unitPriceInput = document.querySelector(`[name="items[${index}][unit_price]"]`);
-            let totalPriceInput = document.querySelector(`[name="items[${index}][total_price]"]`);
+            let unitPrice = document.querySelector(`[name="items[${index}][unit_price]"]`).value.replace(/\D/g, "");
+            let totalPrice = Math.round(quantity * unitPrice * 100) / 100; // Membulatkan ke 2 desimal
 
-            let unitPrice = unitPriceInput.value.replace(/\D/g, ""); // Hanya angka
-            let totalPrice = (quantity * unitPrice) || 0;
-
-            // Update Total Price dan pastikan tetap dalam format Rupiah
-            totalPriceInput.value = formatRupiah(totalPrice.toString());
-
-            // Format ulang Unit Price setiap kali ada perubahan
-            formatCurrency(unitPriceInput);
-
+            document.querySelector(`[name="items[${index}][total_price]"]`).value = formatRupiah(totalPrice
+                .toString());
             updateTotalAmount();
         }
 
