@@ -25,9 +25,9 @@ class DatabaseSeeder extends Seeder
 
 
         $this->call([
-            DepartmentSeeder::class,
+            // DepartmentSeeder::class,
             UserSeeder::class,
-            UnitSeeder::class,
+            // UnitSeeder::class,
         ]);
 
         // BudgetDepartment::factory()->count(10)->create();
@@ -44,7 +44,7 @@ class DatabaseSeeder extends Seeder
         //     $po->update(['total_amount' => $totalAmount]);
         // });
 
-        Supplier::factory()->count(10)->create();
+        // Supplier::factory()->count(10)->create();
 
         // $this->call([
         //     PoApprovalSeeder::class,
