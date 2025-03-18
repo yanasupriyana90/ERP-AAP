@@ -17,7 +17,7 @@ class UserSeeder extends Seeder
     {
         User::insert([
             [
-                'department_id' => 1,
+                'department_id' => null,
                 'name' => 'Superuser',
                 'email' => 'superuser@superuser.com',
                 'email_verified_at' => now(),

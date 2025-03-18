@@ -89,4 +89,5 @@ class UnitController extends Controller
         $unit->delete();
         return redirect()->route('units.index')->with('success', 'Unit berhasil dihapus.');
     }
+
 }
