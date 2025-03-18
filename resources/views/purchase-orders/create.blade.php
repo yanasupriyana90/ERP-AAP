@@ -72,55 +72,6 @@
                     <textarea name="notes" id="notes" class="form-control">{{ old('notes') }}</textarea>
                 </div>
 
-                {{-- <h4>Items</h4>
-                <table class="table" id="itemsTable">
-                    <thead>
-                        <tr>
-                            <th>Item Name</th>
-                            <th>Description</th>
-                            <th>Quantity</th>
-                            <th>Unit</th>
-                            <th>Unit Price</th>
-                            <th>Total Price</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><input type="text" name="items[0][item_name]" class="form-control"></td>
-                            <td><input type="text" name="items[0][description]" class="form-control"></td>
-                            <td><input type="number" step="0.01" name="items[0][quantity]" class="form-control quantity"
-                                    data-index="0" oninput="calculateTotal(0)"></td>
-
-                            <td>
-                                <select name="items[0][unit_id]" class="form-control">
-                                    <option value="">-- Pilih Unit --</option>
-                                    @foreach ($units as $unit)
-                                        <option value="{{ $unit->id }}">{{ $unit->name }}</option>
-                                    @endforeach
-                                </select>
-                            </td>
-
-                            <!-- Input Unit Price -->
-                            <td>
-                                <input type="text" name="items[0][unit_price]" class="form-control unit_price text-right"
-                                    data-index="0" value="{{ old('items.0.unit_price') }}"
-                                    oninput="formatCurrency(this); calculateTotal(0)">
-                            </td>
-
-                            <!-- Input Total Price (readonly) -->
-                            <td>
-                                <input type="text" name="items[0][total_price]"
-                                    class="form-control total_price text-right" value="{{ old('items.0.total_price') }}"
-                                    readonly>
-                            </td>
-                            <td><button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)"><i
-                                        class="fas fa-trash"></i></button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table> --}}
-
                 <h4>Items</h4>
                 <div class="table-responsive">
                     <table class="table table-bordered table-striped" id="itemsTable">
