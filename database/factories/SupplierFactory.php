@@ -30,7 +30,7 @@ class SupplierFactory extends Factory
             'phone' => $this->faker->phoneNumber,
             'email' => $this->faker->unique()->safeEmail,
             'contact_person' => $this->faker->name,
-            'user_id' => fake()->numberBetween(1, 5),
+            'user_id' => 1,
         ];
     }
 }

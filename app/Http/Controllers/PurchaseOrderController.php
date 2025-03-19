@@ -193,9 +193,14 @@ class PurchaseOrderController extends Controller
      */
     public function edit($id)
     {
+        $user = Auth::user(); // Ambil user yang sedang login
+        $departmentId = $user->department_id; // Ambil department dari user login
+
         $purchaseOrder = PurchaseOrder::with('items')->findOrFail($id);
         $departments = Department::all();
-        $budgetDepartments = BudgetDepartment::where('status', 0)->get();
+        $budgetDepartments = BudgetDepartment::where('department_id', $departmentId)
+            ->where('status', 0)
+            ->get(); // Budget department sesuai dan aktif
         $suppliers = Supplier::all();
         $units = Unit::all();
 

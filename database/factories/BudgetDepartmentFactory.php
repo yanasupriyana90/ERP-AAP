@@ -31,8 +31,8 @@ class BudgetDepartmentFactory extends Factory
         $remainingAmount = $amount - $usedAmount; // Sisa anggaran
 
         return [
-            'user_id' => $this->faker->randomElement([2, 3]),
-            'department_id' => $this->faker->randomElement([3, 4, 5]),
+            'user_id' => 2,
+            'department_id' => $this->faker->randomElement([3, 4]),
             'code' => 'BD-' . strtoupper(Str::random(5)),
             'name' => $this->faker->company() . ' Budget',
             'amount' => $amount,

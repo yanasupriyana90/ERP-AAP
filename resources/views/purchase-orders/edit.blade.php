@@ -41,7 +41,7 @@
                         </select>
                     </div>
                     <div class="col-3 mb-3">
-                        <label>Budget Department</label>
+                        <label>Budget</label>
                         <select name="budget_department_id" class="form-control">
                             @foreach ($budgetDepartments as $budgetDepartment)
                                 <option value="{{ $budgetDepartment->id }}"
@@ -78,64 +78,64 @@
                 </div>
 
                 <h4>Items</h4>
-                <table class="table" id="itemsTable">
-                    <thead>
-                        <tr>
-                            <th>Item Name</th>
-                            <th>Description</th>
-                            <th>Quantity</th>
-                            <th>Unit</th>
-                            <th>Unit Price</th>
-                            <th>Total Price</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($purchaseOrder->items as $index => $item)
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped" id="itemsTable">
+                        <thead class="table-dark text-center">
                             <tr>
-                                <td><input type="text" name="items[{{ $index }}][item_name]" class="form-control"
-                                        value="{{ old('items.' . $index . '.item_name', $item->item_name) }}"></td>
-                                <td><input type="text" name="items[{{ $index }}][description]"
-                                        class="form-control"
-                                        value="{{ old('items.' . $index . '.description', $item->description) }}"></td>
-                                {{-- <td><input type="number" name="items[{{ $index }}][quantity]"
-                                        class="form-control quantity" data-index="{{ $index }}"
-                                        oninput="calculateTotal({{ $index }})"
-                                        value="{{ old('items.' . $index . '.quantity', $item->quantity) }}"></td> --}}
-
-                                <td><input type="number" step="0.01" name="items[{{ $index }}][quantity]"
-                                        class="form-control quantity" data-index="{{ $index }}"
-                                        oninput="calculateTotal({{ $index }})"
-                                        value="{{ old('items.' . $index . '.quantity', $item->quantity) }}"></td>
-
-                                <td>
-                                    <select name="items[{{ $index }}][unit_id]" class="form-control">
-                                        @foreach ($units as $unit)
-                                            <option value="{{ $unit->id }}"
-                                                {{ old('items.' . $index . '.unit_id', $item->unit_id) == $unit->id ? 'selected' : '' }}>
-                                                {{ $unit->name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </td>
-                                <td>
-                                    <input type="text" name="items[{{ $index }}][unit_price]"
-                                        class="form-control unit_price text-right" data-index="{{ $index }}"
-                                        oninput="formatCurrency(this); calculateTotal({{ $index }})"
-                                        value="Rp {{ number_format((float) old('items.' . $index . '.unit_price', $item->unit_price), 0, ',', '.') }}">
-                                </td>
-
-                                <td>
-                                    <input type="text" name="items[{{ $index }}][total_price]"
-                                        class="form-control total_price text-right" readonly
-                                        value="Rp {{ number_format((float) old('items.' . $index . '.total_price', $item->total_price), 0, ',', '.') }}">
-                                </td>
-                                <td><button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)"><i
-                                            class="fas fa-trash"></i></button></td>
+                                <th>Item Name</th>
+                                <th>Description</th>
+                                <th style="width: 110px;">Quantity</th>
+                                <th>Unit</th>
+                                <th style="width: 160px;">Unit Price</th>
+                                <th style="width: 160px;">Total Price</th>
+                                <th>Action</th>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @foreach ($purchaseOrder->items as $index => $item)
+                                <tr>
+                                    <td><input type="text" name="items[{{ $index }}][item_name]"
+                                            class="form-control"
+                                            value="{{ old('items.' . $index . '.item_name', $item->item_name) }}"></td>
+                                    <td><input type="text" name="items[{{ $index }}][description]"
+                                            class="form-control"
+                                            value="{{ old('items.' . $index . '.description', $item->description) }}"></td>
+
+
+                                    <td><input type="number" step="0.01" name="items[{{ $index }}][quantity]"
+                                            class="form-control quantity" data-index="{{ $index }}"
+                                            oninput="calculateTotal({{ $index }})"
+                                            value="{{ old('items.' . $index . '.quantity', $item->quantity) }}"></td>
+
+                                    <td>
+                                        <select name="items[{{ $index }}][unit_id]" class="form-control">
+                                            @foreach ($units as $unit)
+                                                <option value="{{ $unit->id }}"
+                                                    {{ old('items.' . $index . '.unit_id', $item->unit_id) == $unit->id ? 'selected' : '' }}>
+                                                    {{ $unit->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input type="text" name="items[{{ $index }}][unit_price]"
+                                            class="form-control unit_price text-right" data-index="{{ $index }}"
+                                            oninput="formatCurrency(this); calculateTotal({{ $index }})"
+                                            value="Rp {{ number_format((float) old('items.' . $index . '.unit_price', $item->unit_price), 0, ',', '.') }}">
+                                    </td>
+
+                                    <td>
+                                        <input type="text" name="items[{{ $index }}][total_price]"
+                                            class="form-control total_price text-right" readonly
+                                            value="Rp {{ number_format((float) old('items.' . $index . '.total_price', $item->total_price), 0, ',', '.') }}">
+                                    </td>
+                                    <td><button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)"><i
+                                                class="fas fa-trash"></i></button></td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
 
                 <button type="button" class="btn btn-primary" onclick="addItem()">Add Item</button>
 
