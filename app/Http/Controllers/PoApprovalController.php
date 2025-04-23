@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\BudgetDepartment;
 use App\Models\PoApproval;
 use App\Models\PurchaseOrder;
+use App\Notifications\PurchaseOrderStatusNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -63,6 +64,9 @@ class PoApprovalController extends Controller
                 'used_amount' => $budget->used_amount + $po->total_amount,
                 'remaining_amount' => $budget->remaining_amount - $po->total_amount
             ]);
+
+            // Notifikasi ke User yang membuat PO
+            $po->user->notify(new PurchaseOrderStatusNotification($po, 'disetujui'));
         }
 
         return back()->with('success', 'Purchase Order berhasil diapprove.');
@@ -100,6 +104,9 @@ class PoApprovalController extends Controller
 
         // Set PO menjadi rejected
         $po->update(['status' => 2]);
+
+        // Notifikasi ke User yang membuat PO
+        $po->user->notify(new PurchaseOrderStatusNotification($po, 'ditolak'));
 
         return back()->with('error', 'Purchase Order ditolak.');
     }

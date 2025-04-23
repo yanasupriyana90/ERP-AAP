@@ -10,6 +10,7 @@ use App\Http\Controllers\PurchaseRequisitionController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\UserController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 // Route::get('/', function () {
@@ -44,8 +45,30 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/purchase-orders/{id}/approve', [PoApprovalController::class, 'approve'])->name('purchase-orders.approve');
     Route::post('/purchase-orders/{id}/reject', [PoApprovalController::class, 'reject'])->name('purchase-orders.reject');
     Route::get('/purchase-orders/{id}/print', [PurchaseOrderController::class, 'print'])->name('purchase-orders.print');
-
 });
+
+Route::get('/notifications/read/{id}', function ($id) {
+    $user = Auth::user();
+    $notification = $user->notifications->find($id);
+
+    if ($notification) {
+        $notification->markAsRead();
+    }
+
+    return redirect()->back();
+})->name('notifications.read');
+
+Route::get('/notifications/mark-all-read', function () {
+    $user = Auth::user();
+
+    if ($user) {
+        $user->unreadNotifications->markAsRead();
+    }
+
+    return redirect()->back();
+})->name('notifications.markAllRead');
+
+
 
 // Route::get('/dashboard-staff', [DashboardController::class, 'staffDashboard'])->name('dashboard.staff')
 // ->middleware('auth', 'role:Staff');

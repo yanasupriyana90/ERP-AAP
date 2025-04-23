@@ -11,6 +11,7 @@ use App\Models\PurchaseRequisition;
 use App\Models\Supplier;
 use App\Models\Unit;
 use App\Models\User;
+use App\Notifications\NewPurchaseOrderNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -158,6 +159,21 @@ class PurchaseOrderController extends Controller
             }
 
             DB::commit();
+
+            // Kirim notifikasi ke Manager Department yang sama
+            $managers = User::where('role', 'Manager')
+                ->where('department_id', $request->department_id)
+                ->get();
+
+            foreach ($managers as $manager) {
+                $manager->notify(new NewPurchaseOrderNotification($purchaseOrder));
+            }
+
+            // Kirim notifikasi ke Direktur
+            $directors = User::where('role', 'Direktur')->get();
+            foreach ($directors as $director) {
+                $director->notify(new NewPurchaseOrderNotification($purchaseOrder));
+            }
 
             // Redirect ke halaman show
             return redirect()->route('purchase-orders.show', $purchaseOrder->id)
